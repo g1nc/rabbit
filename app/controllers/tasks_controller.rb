@@ -2,7 +2,12 @@ class TasksController < ApplicationController
 	before_action :find_task, only: [:show, :edit, :update, :destroy]
 
 	def index
-		@tasks = Task.all.order('created_at DESC')
+		if params[:category].empty?
+			@tasks = Task.all.order('created_at DESC')
+		else
+			@category = Category.find_by_name(params[:category])
+			@tasks = Task.where(category_id: @category.id).order('created_at DESC')
+		end
 	end
 
 	def show
@@ -40,7 +45,7 @@ class TasksController < ApplicationController
 
 	private
 		def task_params
-			params.require(:task).permit(:title, :description, :company, :url)
+			params.require(:task).permit(:title, :description, :company, :url, :category_id)
 		end
 
 		def find_task
